@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 행복한 과학실 사용 예약 & 시간표 관리 시스템</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+        .bg-grid-pattern {
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 bg-grid-pattern pb-12">
+
+    <!-- 상단 헤더 & 환영 메시지 영역 -->
+    <header class="bg-gradient-to-r from-teal-600 via-emerald-600 to-green-600 text-white shadow-lg mb-6">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                
+                <!-- 귀여운 일러스트 & 환영 텍스트 -->
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md shadow-inner flex-shrink-0 animate-bounce">
+                        <!-- 귀여운 과학 시약병 & 원자 SVG 마스코트 -->
+                        <svg class="w-12 h-12 text-yellow-300 drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" 
+                                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l2.828 2.828c1.464 1.465.426 3.972-1.64 3.972H7.226c-2.066 0-3.104-2.507-1.64-3.972l2.828-2.828A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-yellow-300 text-teal-900 text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Science Lab</span>
+                            <span class="text-teal-100 text-xs">✨ 교사 전용 예약 시스템</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+                            🧪 행복한 과학실 사용 일정
+                        </h1>
+                        <p class="text-teal-100 text-sm mt-1">
+                            선생님, 반갑습니다! 오늘도 즐겁고 안전한 과학 수업을 응원합니다. 🥼
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 오른쪽 우측 버튼 및 요약 정보 -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto justify-end">
+                    <!-- 빠른 현황 요약 카드 -->
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 text-center flex justify-around gap-4 px-5">
+                        <div>
+                            <div class="text-[11px] text-teal-100">이번 주 총 예약</div>
+                            <div id="statTotal" class="text-xl font-black text-yellow-300">0건</div>
+                        </div>
+                    </div>
+
+                    <!-- 관리자 페이지 버튼 -->
+                    <button onclick="openAdminAuthModal()" class="w-full sm:w-auto px-4 py-3 bg-slate-900/40 hover:bg-slate-900/60 text-yellow-300 font-bold text-xs rounded-2xl border border-yellow-300/30 backdrop-blur-md transition flex items-center justify-center space-x-1.5 shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>⚙️ 시간표 관리자</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- 컨트롤 바: 주간 선택 및 이동 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- 주 이동 버튼 -->
+            <div class="flex items-center space-x-2">
+                <button id="btnPrevWeek" class="p-2 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 transition font-medium text-sm flex items-center space-x-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <span>이전 주</span>
+                </button>
+                <button id="btnToday" class="px-3 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition shadow-sm">
+                    이번 주
+                </button>
+                <button id="btnNextWeek" class="p-2 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 transition font-medium text-sm flex items-center space-x-1">
+                    <span>다음 주</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <!-- 현재 선택된 주 날짜 표시 -->
+            <div class="flex items-center space-x-3">
+                <div class="text-center sm:text-left">
+                    <span id="currentWeekTitle" class="text-lg font-bold text-slate-800">2026년 8월 4주차</span>
+                    <span id="currentDateRange" class="block text-xs text-slate-500 font-medium">2026.08.24(월) ~ 2026.08.28(금)</span>
+                </div>
+                <!-- 특정 날짜 이동 input -->
+                <input type="date" id="datePicker" class="border border-slate-300 rounded-lg p-1.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
+            </div>
+
+            <!-- 교사 색상 범례 -->
+            <div class="flex items-center space-x-3 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span class="font-semibold text-slate-500">과학과 교사:</span>
+                <span class="inline-flex items-center font-medium text-emerald-800"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span>이서연</span>
+                <span class="inline-flex items-center font-medium text-sky-800"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 mr-1"></span>손아영</span>
+                <span class="inline-flex items-center font-medium text-amber-800"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span>정혜정</span>
+                <span class="inline-flex items-center font-medium text-purple-800"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 mr-1"></span>이정훈</span>
+            </div>
+
+        </div>
+
+        <!-- 주간 실험실 사용 시간표 그리드 -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 text-sm font-semibold border-b border-slate-200">
+                            <th class="p-3 text-center w-28 bg-slate-100 sticky left-0 z-10 border-r border-slate-200">교시 / 시간</th>
+                            <th class="p-3 text-center w-1/5 day-header" data-day="0">월요일 <span class="block text-xs font-normal text-slate-500 day-date">--/--</span></th>
+                            <th class="p-3 text-center w-1/5 day-header" data-day="1">화요일 <span class="block text-xs font-normal text-slate-500 day-date">--/--</span></th>
+                            <th class="p-3 text-center w-1/5 day-header" data-day="2">수요일 <span class="block text-xs font-normal text-slate-500 day-date">--/--</span></th>
+                            <th class="p-3 text-center w-1/5 day-header" data-day="3">목요일 <span class="block text-xs font-normal text-slate-500 day-date">--/--</span></th>
+                            <th class="p-3 text-center w-1/5 day-header" data-day="4">금요일 <span class="block text-xs font-normal text-slate-500 day-date">--/--</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="timetableBody" class="divide-y divide-slate-200 text-xs">
+                        <!-- JS로 교시별 행이 동적으로 생성됩니다. -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 하단 정보 카드 -->
+        <div class="mt-6 bg-teal-50 border border-teal-200 rounded-2xl p-4 flex items-start space-x-3 text-teal-800 text-xs shadow-sm">
+            <span class="text-lg">💡</span>
+            <div>
+                <span class="font-bold text-sm">과학실 예약 이용 안내</span>
+                <p class="mt-1 text-teal-700 leading-relaxed">
+                    - 빈 교시 칸을 클릭하시면 선택하신 선생님의 해당 시간에 편성된 시간표가 자동으로 반영되어 나타납니다.<br>
+                    - 이미 예약된 시간을 클릭하면 상세 내역을 확인하거나 예약을 삭제할 수 있습니다.<br>
+                    - 학기별 선생님 시간표(텍스트/이미지 사진 업로드) 수정은 우측 상단 <strong>[⚙️ 시간표 관리자]</strong> 버튼을 이용해주세요.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 1. 예약 입력 모달 -->
+    <div id="modalReservation" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden">
+            
+            <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">🥼</span>
+                    <h3 class="font-bold text-base">과학실 사용 예약 등록</h3>
+                </div>
+                <button onclick="closeModal('modalReservation')" class="text-white/80 hover:text-white p-1 rounded-lg text-xl font-bold">&times;</button>
+            </div>
+
+            <div class="p-5 space-y-4">
+                
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+                    <div>
+                        <span class="text-slate-400 block">예약 희망 일시</span>
+                        <span id="modalTargetDateTime" class="font-bold text-slate-800 text-sm">2026.08.24(월) 3교시</span>
+                    </div>
+                    <span id="modalTargetTime" class="bg-teal-100 text-teal-800 font-semibold px-2.5 py-1 rounded-lg text-xs">10:40~11:30</span>
+                </div>
+
+                <!-- 담당 교사 선택 -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">1. 담당 교사 선택 <span class="text-red-500">*</span></label>
+                    <div id="teacherButtons" class="grid grid-cols-2 gap-2">
+                        <!-- JS 동적 생성 -->
+                    </div>
+                </div>
+
+                <!-- 교사 시간표 연동 드롭다운 & 이미지 참고 버튼 -->
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-xs font-bold text-slate-700">2. 수업반 및 과목 선택 <span class="text-red-500">*</span></label>
+                        <button type="button" id="btnShowTeacherImageInRes" onclick="viewSelectedTeacherImage()" class="hidden text-[11px] text-teal-700 hover:text-teal-900 font-semibold flex items-center space-x-1 bg-teal-50 px-2 py-0.5 rounded-lg border border-teal-200">
+                            <span>🖼️ 선생님 시간표 사진 보기</span>
+                        </button>
+                    </div>
+                    <select id="selectClass" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                        <option value="">교사를 먼저 선택해주세요</option>
+                    </select>
+                    <p class="text-[11px] text-teal-600 mt-1.5 font-medium" id="scheduleHint">💡 교사 선택 시 해당 시간표 정보가 자동으로 나타납니다.</p>
+                </div>
+
+                <!-- 실험 주제 -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">3. 실험 주제 / 메모 (선택)</label>
+                    <input type="text" id="inputTopic" placeholder="예: 산염기 중화적정 실험, 현미경 관찰" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                </div>
+
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end space-x-2">
+                <button onclick="closeModal('modalReservation')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition">취소</button>
+                <button onclick="saveReservation()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-md transition">예약 확정</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 2. 예약 내역 상세 모달 -->
+    <div id="modalDetail" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-sm overflow-hidden">
+            <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm">🧪 과학실 예약 상세</h3>
+                <button onclick="closeModal('modalDetail')" class="text-white/80 hover:text-white p-1 rounded-lg text-xl font-bold">&times;</button>
+            </div>
+            <div class="p-5 space-y-3 text-xs">
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-400">일시</span>
+                    <span id="detailDateTime" class="font-semibold text-slate-800">--</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-400">담당 교사</span>
+                    <span id="detailTeacher" class="font-bold text-teal-700 text-sm">--</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-400">수업반 / 과목</span>
+                    <span id="detailClass" class="font-semibold text-slate-800">--</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-400">실험 주제</span>
+                    <span id="detailTopic" class="text-slate-700">--</span>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="deleteCurrentReservation()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-bold transition text-xs">
+                    🗑️ 예약 취소(삭제)
+                </button>
+                <button onclick="closeModal('modalDetail')" class="px-4 py-2 bg-slate-700 text-white rounded-xl font-semibold transition text-xs">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 관리자 비밀번호 인증 모달 -->
+    <div id="modalAdminAuth" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-xs overflow-hidden">
+            <div class="bg-slate-900 text-white p-4 text-center">
+                <div class="text-2xl mb-1">🔐</div>
+                <h3 class="font-bold text-sm">관리자 인증</h3>
+                <p class="text-[11px] text-slate-400 mt-1">시간표 수정을 위한 비밀번호를 입력하세요.</p>
+            </div>
+            <div class="p-5 space-y-3">
+                <input type="password" id="adminPasswordInput" placeholder="비밀번호 입력" 
+                       onkeyup="if(event.key==='Enter') verifyAdminPassword()"
+                       class="w-full border border-slate-300 rounded-xl p-2.5 text-center font-mono text-sm focus:ring-2 focus:ring-slate-800 focus:outline-none">
+            </div>
+            <div class="bg-slate-50 p-3 border-t border-slate-200 flex justify-end space-x-2">
+                <button onclick="closeModal('modalAdminAuth')" class="px-3 py-1.5 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">취소</button>
+                <button onclick="verifyAdminPassword()" class="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-bold">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 관리자 페이지: 교사 시간표 등록/수정 모달 (이미지 업로드 기능 포함) -->
+    <div id="modalAdminTimetable" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-5xl overflow-hidden max-h-[92vh] flex flex-col">
+            
+            <!-- 관리자 모달 헤더 -->
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center flex-shrink-0">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">⚙️</span>
+                    <div>
+                        <h3 class="font-bold text-base">과학과 교사 시간표 관리 시스템</h3>
+                        <p class="text-[11px] text-slate-400">교사별 주간 시간표 이미지를 첨부하거나 텍스트 시간표를 수정하세요.</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modalAdminTimetable')" class="text-white/80 hover:text-white p-1 rounded-lg text-2xl font-bold">&times;</button>
+            </div>
+
+            <!-- 관리자 모달 바디 (탭 + 이미지 업로드 영역 + 시간표 입력 그리드) -->
+            <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                
+                <!-- 교사 선택 탭 -->
+                <div class="flex border-b border-slate-200 space-x-1" id="adminTeacherTabs">
+                    <!-- JS 생성 -->
+                </div>
+
+                <!-- 🖼️ 시간표 이미지 업로드 & 관리 영역 -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-base">📸</span>
+                            <div>
+                                <h4 class="font-bold text-xs text-slate-800" id="adminTeacherImageTitle">선생님 시간표 이미지 첨부</h4>
+                                <p class="text-[11px] text-slate-500">시간표 이미지(캡처 또는 사진)를 업로드하면 언제든 편하게 조회할 수 있습니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- 업로드 버튼 그룹 -->
+                        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                            <input type="file" id="adminImageFileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                            <button onclick="document.getElementById('adminImageFileInput').click()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1 shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span>이미지 파일 선택</span>
+                            </button>
+                            <button id="btnAiExtract" onclick="analyzeTimetableImageWithAI()" class="hidden px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition items-center space-x-1 shadow-sm">
+                                <span>✨ AI 시간표 자동 채우기</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 이미지 미리보기 박스 -->
+                    <div id="adminImagePreviewContainer" class="hidden flex items-center space-x-4 bg-white p-3 rounded-xl border border-slate-200">
+                        <img id="adminImagePreview" src="" alt="시간표 이미지" class="h-24 w-auto object-cover rounded-lg border border-slate-200 cursor-pointer shadow-sm hover:opacity-90" onclick="viewLargeImage(this.src)">
+                        <div class="flex-1 text-xs space-y-1.5">
+                            <div class="font-bold text-slate-800 flex items-center space-x-1">
+                                <span class="text-teal-600">✅ 이미지 등록 완료</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">이미지를 클릭하면 크게 볼 수 있으며, AI 버튼을 누르면 그리드에 글자가 자동 인식됩니다.</p>
+                            <div class="flex space-x-2 pt-1">
+                                <button onclick="viewLargeImage(document.getElementById('adminImagePreview').src)" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold transition">
+                                    🔍 크게 보기
+                                </button>
+                                <button onclick="deleteTeacherImage()" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[11px] font-semibold transition">
+                                    🗑️ 이미지 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="adminImageEmptyMsg" class="text-center py-3 border-2 border-dashed border-slate-200 rounded-xl text-xs text-slate-400">
+                        아직 첨부된 시간표 이미지가 없습니다. [이미지 파일 선택]을 눌러 시간표 사진을 첨부해보세요.
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500 pt-1">
+                    <span>* 텍스트 시간표 직접 수정 (예: <code>1학년 1반 (통합과학)</code> 등)</span>
+                    <button onclick="resetTeacherScheduleToDefault()" class="text-xs text-rose-600 hover:underline font-semibold">
+                        🔄 선택된 교사 교시 시간표 비우기
+                    </button>
+                </div>
+
+                <!-- 시간표 입력 테이블 -->
+                <div class="border rounded-xl overflow-hidden border-slate-200 shadow-sm">
+                    <table class="w-full text-xs text-center border-collapse">
+                        <thead class="bg-slate-100 font-bold text-slate-700 border-b border-slate-200">
+                            <tr>
+                                <th class="p-2.5 w-16 border-r border-slate-200">교시</th>
+                                <th class="p-2.5 border-r border-slate-200">월요일</th>
+                                <th class="p-2.5 border-r border-slate-200">화요일</th>
+                                <th class="p-2.5 border-r border-slate-200">수요일</th>
+                                <th class="p-2.5 border-r border-slate-200">목요일</th>
+                                <th class="p-2.5">금요일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminScheduleGrid" class="divide-y divide-slate-200">
+                            <!-- JS 동적 생성 (1~7교시 입력란) -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- 관리자 모달 푸터 -->
+            <div class="bg-slate-100 p-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 flex-shrink-0">
+                <button onclick="resetAllSchedulesToInitial()" class="w-full sm:w-auto px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-xl text-xs font-bold transition">
+                    ⚠️ 전체 시간표 초기 상태 복원
+                </button>
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <button onclick="changeAdminPassword()" class="px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition">
+                        🔑 비밀번호 변경
+                    </button>
+                    <button onclick="closeModal('modalAdminTimetable')" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-800 rounded-xl text-xs font-bold transition">닫기</button>
+                    <button onclick="saveAdminTimetable()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-md transition">💾 변경 시간표 저장</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 5. 이미지 크게 보기 (라이트박스) 모달 -->
+    <div id="modalImageViewer" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="relative max-w-4xl max-h-[90vh] bg-white rounded-2xl overflow-hidden p-2 flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center p-3 bg-slate-900 text-white rounded-t-xl">
+                <h3 id="imageViewerTitle" class="font-bold text-sm">📷 시간표 이미지 상세보기</h3>
+                <button onclick="closeModal('modalImageViewer')" class="text-white hover:text-yellow-300 text-2xl font-bold px-2">&times;</button>
+            </div>
+            <div class="overflow-auto p-2 flex justify-center items-center bg-slate-950 rounded-b-xl min-h-[300px]">
+                <img id="largeImageDisplay" src="" alt="시간표 큰 이미지" class="max-h-[75vh] w-auto object-contain rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 로딩 모달 -->
+    <div id="modalAiLoading" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-xs text-center space-y-3 shadow-2xl">
+            <div class="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <h3 class="font-bold text-sm text-slate-800">✨ AI가 시간표 이미지를 분석하는 중...</h3>
+            <p class="text-xs text-slate-500">이미지에서 요일/교시별 과목과 반 정보를 자동으로 읽고 있습니다. 잠시만 기다려주세요.</p>
+        </div>
+    </div>
+
+    <!-- Toast 알림 -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl hidden z-50 items-center space-x-2 text-xs transition-opacity duration-300">
+        <span id="toastIcon">✅</span>
+        <span id="toastMsg">처리되었습니다.</span>
+    </div>
+
+    <!-- 스크립트 로직 -->
+    <script>
+        // 1. 기초 설정 및 기본 교사 데이터
+        const TEACHERS = ['이서연', '손아영', '정혜정', '이정훈'];
+
+        const TEACHER_COLORS = {
+            '이서연': { bg: 'bg-emerald-50 hover:bg-emerald-100', border: 'border-emerald-300', text: 'text-emerald-900', badge: 'bg-emerald-500' },
+            '손아영': { bg: 'bg-sky-50 hover:bg-sky-100', border: 'border-sky-300', text: 'text-sky-900', badge: 'bg-sky-500' },
+            '정혜정': { bg: 'bg-amber-50 hover:bg-amber-100', border: 'border-amber-300', text: 'text-amber-900', badge: 'bg-amber-500' },
+            '이정훈': { bg: 'bg-purple-50 hover:bg-purple-100', border: 'border-purple-300', text: 'text-purple-900', badge: 'bg-purple-500' }
+        };
+
+        const PERIODS = [
+            { period: 1, time: "08:40 ~ 09:30" },
+            { period: 2, time: "09:40 ~ 10:30" },
+            { period: 3, time: "10:40 ~ 11:30" },
+            { period: 4, time: "11:40 ~ 12:30" },
+            { period: 5, time: "13:30 ~ 14:20" },
+            { period: 6, time: "14:30 ~ 15:20" },
+            { period: 7, time: "15:30 ~ 16:20" }
+        ];
+
+        // 기본 백업용 과학과 교사 시간표 데이터
+        const DEFAULT_TIMETABLES = {
+            '이서연': {
+                0: { 1: '1학년 1반 (통합과학)', 3: '3학년 2반 (화학I)', 5: '1학년 2반 (통합과학)' },
+                1: { 2: '1학년 1반 (통합과학)', 4: '3학년 1반 (화학I)', 6: '3학년 2반 (화학I)' },
+                2: { 1: '1학년 2반 (통합과학)', 3: '3학년 2반 (화학I)', 5: '1학년 1반 (통합과학)' },
+                3: { 2: '3학년 1반 (화학I)', 4: '1학년 2반 (통합과학)', 6: '3학년 2반 (화학실험)' },
+                4: { 2: '3학년 1반 (화학I)', 4: '1학년 1반 (통합과학)', 5: '동아리 (탐구반)' }
+            },
+            '손아영': {
+                0: { 2: '2학년 1반 (지구과학)', 4: '1학년 3반 (통합과학)', 6: '2학년 2반 (지구과학)' },
+                1: { 1: '2학년 2반 (지구과학)', 3: '1학년 4반 (통합과학)', 5: '1학년 3반 (통합과학)' },
+                2: { 2: '1학년 4반 (통합과학)', 4: '2학년 1반 (지구과학)', 6: '1학년 3반 (통합과학)' },
+                3: { 1: '1학년 3반 (통합과학)', 3: '2학년 2반 (지구과학)', 5: '1학년 4반 (통합과학)' },
+                4: { 1: '2학년 1반 (지구과학)', 3: '1학년 4반 (통합과학)', 6: '동아리 (천체관측)' }
+            },
+            '정혜정': {
+                0: { 3: '2학년 3반 (생명과학)', 5: '3학년 3반 (물리I)', 7: '2학년 4반 (생명과학)' },
+                1: { 3: '2학년 4반 (생명과학)', 5: '3학년 4반 (물리I)', 7: '3학년 3반 (물리실험)' },
+                2: { 2: '2학년 3반 (생명과학)', 5: '3학년 3반 (물리I)', 7: '2학년 4반 (생명과학)' },
+                3: { 1: '3학년 4반 (물리I)', 5: '2학년 4반 (생명과학)', 7: '3학년 3반 (물리I)' },
+                4: { 3: '2학년 3반 (생명과학)', 5: '3학년 4반 (물리I)' }
+            },
+            '이정훈': {
+                0: { 4: '1학년 5반 (통합과학)', 6: '3학년 5반 (물리II)', 7: '방과후 (물리탐구)' },
+                1: { 2: '1학년 6반 (통합과학)', 6: '1학년 5반 (통합과학)', 7: '3학년 5반 (물리II)' },
+                2: { 3: '1학년 5반 (통합과학)', 6: '3학년 5반 (물리II)', 7: '방과후 (물리탐구)' },
+                3: { 4: '1학년 6반 (통합과학)', 6: '1학년 5반 (통합과학)' },
+                4: { 2: '1학년 6반 (통합과학)', 4: '3학년 5반 (물리II)', 6: '동아리 (로봇공학)' }
+            }
+        };
+
+        // 앱 데이터 상태
+        let currentMonday = getMonday(new Date());
+        let reservations = JSON.parse(localStorage.getItem('sci_lab_reservations') || '{}');
+        let teacherTimetables = JSON.parse(localStorage.getItem('sci_lab_timetables') || JSON.stringify(DEFAULT_TIMETABLES));
+        let teacherImages = JSON.parse(localStorage.getItem('sci_lab_teacher_images') || '{}');
+        let adminPassword = localStorage.getItem('sci_lab_admin_pw') || '1234'; // 초기 기본값 1234
+
+        let activeSlot = null; // { dateStr, dayIdx, period }
+        let selectedTeacher = null;
+        let activeDetailKey = null;
+        let currentAdminTeacher = TEACHERS[0]; // 관리자 페이지 선택 교사
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            initSampleReservationsIfEmpty();
+            renderCalendarHeader();
+            renderTimetableGrid();
+            setupEventListeners();
+        });
+
+        // 예시 예약 데이터 초기 생성
+        function initSampleReservationsIfEmpty() {
+            if (Object.keys(reservations).length === 0) {
+                const monStr = formatDate(currentMonday);
+                const tueStr = formatDate(addDays(currentMonday, 1));
+                const wedStr = formatDate(addDays(currentMonday, 2));
+
+                reservations[`${monStr}_2`] = { teacher: '손아영', className: '2학년 1반 (지구과학)', topic: '퇴적암 관찰 및 분류' };
+                reservations[`${monStr}_5`] = { teacher: '이서연', className: '1학년 2반 (통합과학)', topic: '알칼리 금속 반응 실험' };
+                reservations[`${tueStr}_3`] = { teacher: '정혜정', className: '2학년 4반 (생명과학)', topic: '광합성 색소 분리 얇은막 크로마토그래피' };
+                reservations[`${wedStr}_6`] = { teacher: '이정훈', className: '3학년 5반 (물리II)', topic: '포토게이트를 이용한 가속도 측정' };
+
+                saveReservationsToStorage();
+            }
+        }
+
+        // 날짜 계산 함수
+        function getMonday(d) {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function formatDisplayDate(date) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        // 주간 헤더 렌더링
+        function renderCalendarHeader() {
+            const fri = addDays(currentMonday, 4);
+            const month = currentMonday.getMonth() + 1;
+            const weekNum = Math.ceil(currentMonday.getDate() / 7);
+            
+            document.getElementById('currentWeekTitle').innerText = `${currentMonday.getFullYear()}년 ${month}월 ${weekNum}주차`;
+            document.getElementById('currentDateRange').innerText = 
+                `${formatDate(currentMonday).replace(/-/g, '.')} (월) ~ ${formatDate(fri).replace(/-/g, '.')} (금)`;
+            
+            document.getElementById('datePicker').value = formatDate(currentMonday);
+
+            const headers = document.querySelectorAll('.day-header');
+            const todayStr = formatDate(new Date());
+
+            headers.forEach(th => {
+                const dayIdx = parseInt(th.getAttribute('data-day'));
+                const dayDate = addDays(currentMonday, dayIdx);
+                const dateStr = formatDate(dayDate);
+                
+                const dateSpan = th.querySelector('.day-date');
+                if (dateSpan) dateSpan.innerText = formatDisplayDate(dayDate);
+
+                if (dateStr === todayStr) {
+                    th.classList.add('bg-teal-50', 'text-teal-800');
+                } else {
+                    th.classList.remove('bg-teal-50', 'text-teal-800');
+                }
+            });
+        }
+
+        // 메인 과학실 시간표 그리드 렌더링
+        function renderTimetableGrid() {
+            const tbody = document.getElementById('timetableBody');
+            tbody.innerHTML = '';
+            let totalWeekCount = 0;
+
+            PERIODS.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition";
+
+                const tdPeriod = document.createElement('td');
+                tdPeriod.className = "p-2 sm:p-3 text-center border-r border-slate-200 bg-slate-50 font-medium sticky left-0 z-10 shadow-sm";
+                tdPeriod.innerHTML = `
+                    <div class="font-bold text-slate-800 text-sm">${p.period}교시</div>
+                    <div class="text-[10px] text-slate-400 font-normal mt-0.5">${p.time}</div>
+                `;
+                tr.appendChild(tdPeriod);
+
+                for (let dayIdx = 0; dayIdx < 5; dayIdx++) {
+                    const targetDate = addDays(currentMonday, dayIdx);
+                    const dateStr = formatDate(targetDate);
+                    const slotKey = `${dateStr}_${p.period}`;
+
+                    const td = document.createElement('td');
+                    td.className = "p-1.5 sm:p-2 border-r border-b border-slate-200 h-20 vertical-top transition relative";
+
+                    const resData = reservations[slotKey];
+
+                    if (resData) {
+                        totalWeekCount++;
+                        const color = TEACHER_COLORS[resData.teacher] || { bg: 'bg-teal-50', border: 'border-teal-300', text: 'text-teal-900', badge: 'bg-teal-500' };
+
+                        td.innerHTML = `
+                            <div onclick="openDetailModal('${slotKey}')" 
+                                 class="w-full h-full p-2 rounded-xl border ${color.border} ${color.bg} ${color.text} flex flex-col justify-between cursor-pointer shadow-sm hover:shadow transition transform hover:-translate-y-0.5">
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-xs flex items-center">
+                                            <span class="w-1.5 h-1.5 rounded-full ${color.badge} mr-1.5"></span>
+                                            ${resData.teacher}
+                                        </span>
+                                        <span class="text-[10px] opacity-75 font-mono">예약</span>
+                                    </div>
+                                    <div class="font-semibold text-xs mt-1 truncate" title="${resData.className}">
+                                        ${resData.className}
+                                    </div>
+                                </div>
+                                ${resData.topic ? `<div class="text-[10px] opacity-80 truncate mt-1">🔬 ${resData.topic}</div>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        td.innerHTML = `
+                            <button onclick="openReservationModal('${dateStr}', ${dayIdx}, ${p.period})" 
+                                    class="w-full h-full rounded-xl border border-dashed border-slate-200 hover:border-teal-400 hover:bg-teal-50/50 flex flex-col items-center justify-center text-slate-400 hover:text-teal-600 transition group p-2">
+                                <svg class="w-4 h-4 opacity-40 group-hover:opacity-100 transition transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span class="text-[10px] font-medium mt-1 opacity-0 group-hover:opacity-100 transition">예약</span>
+                            </button>
+                        `;
+                    }
+
+                    tr.appendChild(td);
+                }
+
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('statTotal').innerText = `${totalWeekCount}건`;
+        }
+
+        // 예약 모달 열기
+        function openReservationModal(dateStr, dayIdx, period) {
+            activeSlot = { dateStr, dayIdx, period };
+            selectedTeacher = null;
+
+            const dayNames = ['월', '화', '수', '목', '금'];
+            const pInfo = PERIODS.find(p => p.period === period);
+
+            document.getElementById('modalTargetDateTime').innerText = `${dateStr} (${dayNames[dayIdx]}) ${period}교시`;
+            document.getElementById('modalTargetTime').innerText = pInfo ? pInfo.time : '';
+            document.getElementById('inputTopic').value = '';
+            document.getElementById('btnShowTeacherImageInRes').classList.add('hidden');
+
+            const teacherBtnContainer = document.getElementById('teacherButtons');
+            teacherBtnContainer.innerHTML = '';
+
+            TEACHERS.forEach(t => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `p-2.5 rounded-xl border border-slate-200 font-bold text-xs text-slate-700 hover:border-teal-500 hover:bg-teal-50 flex items-center justify-center space-x-1.5 transition`;
+                btn.onclick = () => selectTeacher(t, btn);
+                btn.innerHTML = `
+                    <span class="w-2 h-2 rounded-full ${TEACHER_COLORS[t].badge}"></span>
+                    <span>${t} 교사</span>
+                `;
+                teacherBtnContainer.appendChild(btn);
+            });
+
+            const selectClass = document.getElementById('selectClass');
+            selectClass.innerHTML = `<option value="">⬅ 위에서 교사를 먼저 선택해주세요</option>`;
+            document.getElementById('scheduleHint').innerText = "💡 교사 선택 시 관리자가 설정한 시간표가 반영됩니다.";
+
+            openModal('modalReservation');
+        }
+
+        // 교사 선택시 연동 시간표 드롭다운 생성
+        function selectTeacher(teacherName, btnElement) {
+            selectedTeacher = teacherName;
+
+            const buttons = document.querySelectorAll('#teacherButtons button');
+            buttons.forEach(b => b.classList.remove('ring-2', 'ring-teal-500', 'bg-teal-50', 'border-teal-500'));
+            btnElement.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50', 'border-teal-500');
+
+            const selectClass = document.getElementById('selectClass');
+            selectClass.innerHTML = '';
+
+            // 이미지 보기 버튼 노출 여부
+            const btnImg = document.getElementById('btnShowTeacherImageInRes');
+            if (teacherImages[teacherName]) {
+                btnImg.classList.remove('hidden');
+            } else {
+                btnImg.classList.add('hidden');
+            }
+
+            const { dayIdx, period } = activeSlot;
+            const teacherSchedule = teacherTimetables[teacherName] || {};
+            const daySchedule = teacherSchedule[dayIdx] || {};
+            const scheduledClass = daySchedule[period];
+
+            if (scheduledClass) {
+                const optPrimary = document.createElement('option');
+                optPrimary.value = scheduledClass;
+                optPrimary.innerText = `⭐ [등록된 시간표] ${scheduledClass}`;
+                optPrimary.selected = true;
+                selectClass.appendChild(optPrimary);
+
+                document.getElementById('scheduleHint').innerText = `✨ ${teacherName} 교사님의 시간표 [${scheduledClass}]가 자동 연결되었습니다.`;
+            } else {
+                document.getElementById('scheduleHint').innerText = `ℹ️ ${teacherName} 교사님의 해당 시간 지정 수업이 없습니다.`;
+            }
+
+            // 교사의 전체 등록 수업 추가
+            const allTeacherClasses = new Set();
+            Object.values(teacherSchedule).forEach(dayObj => {
+                Object.values(dayObj).forEach(cls => {
+                    if (cls && cls !== scheduledClass) allTeacherClasses.add(cls);
+                });
+            });
+
+            if (allTeacherClasses.size > 0) {
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = `${teacherName} 교사의 기타 등록 수업`;
+                allTeacherClasses.forEach(cls => {
+                    const opt = document.createElement('option');
+                    opt.value = cls;
+                    opt.innerText = cls;
+                    optGroup.appendChild(opt);
+                });
+                selectClass.appendChild(optGroup);
+            }
+
+            const optCustom = document.createElement('option');
+            optCustom.value = "CUSTOM";
+            optCustom.innerText = "✏️ 직접 입력 (기타 수업/행사)";
+            selectClass.appendChild(optCustom);
+        }
+
+        function viewSelectedTeacherImage() {
+            if (selectedTeacher && teacherImages[selectedTeacher]) {
+                viewLargeImage(teacherImages[selectedTeacher], `${selectedTeacher} 선생님 시간표 이미지`);
+            }
+        }
+
+        // 예약 확정 저장
+        function saveReservation() {
+            if (!activeSlot) return;
+
+            if (!selectedTeacher) {
+                showToast("⚠️ 담당 교사를 선택해주세요.", "error");
+                return;
+            }
+
+            const selectClass = document.getElementById('selectClass');
+            let className = selectClass.value;
+
+            if (!className) {
+                showToast("⚠️ 수업반 및 과목을 선택해주세요.", "error");
+                return;
+            }
+
+            if (className === "CUSTOM") {
+                const customInput = prompt("수업반 및 과목명을 입력하세요 (예: 2학년 방과후 과학):");
+                if (!customInput || !customInput.trim()) {
+                    showToast("수업반 이름이 입력되지 않았습니다.", "error");
+                    return;
+                }
+                className = customInput.trim();
+            }
+
+            const topic = document.getElementById('inputTopic').value.trim();
+            const slotKey = `${activeSlot.dateStr}_${activeSlot.period}`;
+
+            reservations[slotKey] = {
+                teacher: selectedTeacher,
+                className: className,
+                topic: topic,
+                updatedAt: new Date().toISOString()
+            };
+
+            saveReservationsToStorage();
+            renderTimetableGrid();
+            closeModal('modalReservation');
+            showToast(`✅ ${selectedTeacher} 교사 (${className}) 예약이 확정되었습니다.`);
+        }
+
+        // 예약 상세 모달
+        function openDetailModal(slotKey) {
+            const data = reservations[slotKey];
+            if (!data) return;
+
+            activeDetailKey = slotKey;
+            const [dateStr, period] = slotKey.split('_');
+
+            document.getElementById('detailDateTime').innerText = `${dateStr} / ${period}교시`;
+            document.getElementById('detailTeacher').innerText = `${data.teacher} 선생님`;
+            document.getElementById('detailClass').innerText = data.className;
+            document.getElementById('detailTopic').innerText = data.topic || '(입력된 실험 주제 없음)';
+
+            openModal('modalDetail');
+        }
+
+        function deleteCurrentReservation() {
+            if (!activeDetailKey) return;
+
+            if (confirm("정말로 이 과학실 사용 예약을 취소하시겠습니까?")) {
+                delete reservations[activeDetailKey];
+                saveReservationsToStorage();
+                renderTimetableGrid();
+                closeModal('modalDetail');
+                showToast("🗑️ 예약이 취소되었습니다.");
+            }
+        }
+
+        // ==========================================
+        // 🛠️ 관리자 기능 (비밀번호 인증, 시간표 & 이미지 관리)
+        // ==========================================
+
+        function openAdminAuthModal() {
+            document.getElementById('adminPasswordInput').value = '';
+            openModal('modalAdminAuth');
+            setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
+        }
+
+        function verifyAdminPassword() {
+            const inputPw = document.getElementById('adminPasswordInput').value;
+            if (inputPw === adminPassword) {
+                closeModal('modalAdminAuth');
+                openAdminTimetableModal();
+            } else {
+                showToast("❌ 비밀번호가 올바르지 않습니다.", "error");
+            }
+        }
+
+        function changeAdminPassword() {
+            const newPw = prompt("새로운 관리자 비밀번호를 입력하세요:");
+            if (newPw && newPw.trim()) {
+                adminPassword = newPw.trim();
+                localStorage.setItem('sci_lab_admin_pw', adminPassword);
+                showToast("🔑 관리자 비밀번호가 새로 변경되었습니다.");
+            }
+        }
+
+        function openAdminTimetableModal() {
+            renderAdminTeacherTabs();
+            renderAdminImageArea();
+            renderAdminGrid();
+            openModal('modalAdminTimetable');
+        }
+
+        // 교사 선택 탭 렌더링
+        function renderAdminTeacherTabs() {
+            const tabContainer = document.getElementById('adminTeacherTabs');
+            tabContainer.innerHTML = '';
+
+            TEACHERS.forEach(teacher => {
+                const isSelected = teacher === currentAdminTeacher;
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2 text-xs font-bold rounded-t-xl transition border-b-2 ${
+                    isSelected 
+                    ? 'border-teal-600 text-teal-700 bg-teal-50/50' 
+                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                }`;
+                btn.innerText = `${teacher} 교사`;
+                btn.onclick = () => {
+                    currentAdminTeacher = teacher;
+                    renderAdminTeacherTabs();
+                    renderAdminImageArea();
+                    renderAdminGrid();
+                };
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        // 관리자 모달 내 이미지 영역 UI 상태 업데이트
+        function renderAdminImageArea() {
+            document.getElementById('adminTeacherImageTitle').innerText = `${currentAdminTeacher} 선생님 시간표 이미지 첨부`;
+            const previewContainer = document.getElementById('adminImagePreviewContainer');
+            const emptyMsg = document.getElementById('adminImageEmptyMsg');
+            const imgEl = document.getElementById('adminImagePreview');
+            const btnAi = document.getElementById('btnAiExtract');
+
+            const existingImg = teacherImages[currentAdminTeacher];
+
+            if (existingImg) {
+                imgEl.src = existingImg;
+                previewContainer.classList.remove('hidden');
+                emptyMsg.classList.add('hidden');
+                btnAi.classList.remove('hidden');
+                btnAi.classList.add('inline-flex');
+            } else {
+                imgEl.src = '';
+                previewContainer.classList.add('hidden');
+                emptyMsg.classList.remove('hidden');
+                btnAi.classList.add('hidden');
+                btnAi.classList.remove('inline-flex');
+            }
+        }
+
+        // 시간표 이미지 파일 업로드 핸들러 및 리사이징 압축
+        function handleImageUpload(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast("⚠️ 이미지 파일(PNG, JPG 등)만 업로드할 수 있습니다.", "error");
+                return;
+            }
+
+            // 용량 압축 및 base64 변환
+            compressImage(file, 1000, 0.8, (compressedBase64) => {
+                teacherImages[currentAdminTeacher] = compressedBase64;
+                saveImagesToStorage();
+                renderAdminImageArea();
+                showToast(`📷 ${currentAdminTeacher} 교사의 시간표 이미지가 등록되었습니다.`);
+            });
+
+            // input 초기화
+            e.target.value = '';
+        }
+
+        // 이미지 압축 유틸리티 (LocalStorage 용량 효율적 활용)
+        function compressImage(file, maxDimension, quality, callback) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxDimension || height > maxDimension) {
+                        if (width > height) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        } else {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    callback(dataUrl);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function deleteTeacherImage() {
+            if (confirm(`${currentAdminTeacher} 교사의 시간표 이미지를 삭제하시겠습니까?`)) {
+                delete teacherImages[currentAdminTeacher];
+                saveImagesToStorage();
+                renderAdminImageArea();
+                showToast("🗑️ 이미지가 삭제되었습니다.");
+            }
+        }
+
+        function viewLargeImage(srcUrl, title = "") {
+            document.getElementById('largeImageDisplay').src = srcUrl;
+            document.getElementById('imageViewerTitle').innerText = title || `${currentAdminTeacher} 선생님 시간표 이미지`;
+            openModal('modalImageViewer');
+        }
+
+        // ✨ Gemini AI 서비스 이용 이미지 속 시간표 텍스트 자동 추출
+        async function analyzeTimetableImageWithAI() {
+            const imageBase64 = teacherImages[currentAdminTeacher];
+            if (!imageBase64) {
+                showToast("⚠️ 등록된 이미지가 없습니다.", "error");
+                return;
+            }
+
+            openModal('modalAiLoading');
+
+            try {
+                // Base64 header 제거
+                const base64Data = imageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+                const mimeType = imageBase64.match(/^data:(image\/[a-zA-Z]+);base64,/)?.[1] || "image/jpeg";
+
+                const apiKey = ""; // Canvas 환경에서 자동 주입
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const systemPrompt = `You are a helpful assistant for Korean school teachers. Analyze the teacher's schedule image and extract the class name or subject for each day of the week (Monday=0, Tuesday=1, Wednesday=2, Thursday=3, Friday=4) and periods (1 to 7). Output ONLY a JSON array of entries: [{"day": 0..4, "period": 1..7, "className": "Class name or subject"}]. If a cell is empty or free period, omit it. Format className cleanly, e.g. "1학년 1반 (통합과학)" or "2학년 3반".`;
+
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [
+                            { text: "이 교사의 시간표 이미지에서 월요일(0)~금요일(4), 1~7교시의 수업반/과목 정보를 추출해 JSON 스키마로 정리해줘." },
+                            {
+                                inlineData: {
+                                    mimeType: mimeType,
+                                    data: base64Data
+                                }
+                            }
+                        ]
+                    }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    "day": { type: "INTEGER", description: "0 for Monday, 1 for Tue, 2 for Wed, 3 for Thu, 4 for Fri" },
+                                    "period": { type: "INTEGER", description: "1 to 7 period" },
+                                    "className": { type: "STRING", description: "Class name and subject e.g. 1학년 2반 (통합과학)" }
+                                },
+                                required: ["day", "period", "className"]
+                            }
+                        }
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("API call failed");
+
+                const result = await response.json();
+                const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                closeModal('modalAiLoading');
+
+                if (jsonText) {
+                    const extractedList = JSON.parse(jsonText);
+                    let count = 0;
+
+                    // 파싱 결과를 입력 칸에 적용
+                    extractedList.forEach(item => {
+                        const input = document.querySelector(`#adminScheduleGrid input[data-day="${item.day}"][data-period="${item.period}"]`);
+                        if (input && item.className) {
+                            input.value = item.className;
+                            count++;
+                        }
+                    });
+
+                    showToast(`✨ AI가 이미지에서 ${count}개의 수업을 자동으로 채웠습니다!`);
+                } else {
+                    showToast("⚠️ 이미지에서 시간표 텍스트를 읽지 못했습니다.", "error");
+                }
+
+            } catch (err) {
+                console.error(err);
+                closeModal('modalAiLoading');
+                showToast("⚠️ AI 분석 중 오류가 발생했습니다. 직접 수동 입력해주세요.", "error");
+            }
+        }
+
+        // 시간표 입력 그리드 렌더링
+        function renderAdminGrid() {
+            const gridBody = document.getElementById('adminScheduleGrid');
+            gridBody.innerHTML = '';
+
+            const teacherSchedule = teacherTimetables[currentAdminTeacher] || {};
+
+            PERIODS.forEach(p => {
+                const tr = document.createElement('tr');
+
+                const tdPeriod = document.createElement('td');
+                tdPeriod.className = "p-2 bg-slate-50 font-bold text-slate-600 border-r border-slate-200";
+                tdPeriod.innerText = `${p.period}교시`;
+                tr.appendChild(tdPeriod);
+
+                // 월~금 5일 입력란
+                for (let dayIdx = 0; dayIdx < 5; dayIdx++) {
+                    const td = document.createElement('td');
+                    td.className = "p-1 border-r border-slate-200";
+
+                    const currentValue = (teacherSchedule[dayIdx] && teacherSchedule[dayIdx][p.period]) || '';
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = "w-full p-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none transition";
+                    input.placeholder = "수업반/과목";
+                    input.value = currentValue;
+                    input.setAttribute('data-day', dayIdx);
+                    input.setAttribute('data-period', p.period);
+
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                }
+
+                gridBody.appendChild(tr);
+            });
+        }
+
+        // 관리자 편집 화면 입력값 수집 및 저장
+        function saveAdminTimetable() {
+            const inputs = document.querySelectorAll('#adminScheduleGrid input');
+            const newSchedule = { 0: {}, 1: {}, 2: {}, 3: {}, 4: {} };
+
+            inputs.forEach(input => {
+                const day = input.getAttribute('data-day');
+                const period = input.getAttribute('data-period');
+                const val = input.value.trim();
+
+                if (val) {
+                    newSchedule[day][period] = val;
+                }
+            });
+
+            teacherTimetables[currentAdminTeacher] = newSchedule;
+            saveTimetablesToStorage();
+            showToast(`💾 ${currentAdminTeacher} 교사의 시간표가 저장되었습니다.`);
+            closeModal('modalAdminTimetable');
+        }
+
+        // 선택 교사 시간표 전체 비우기
+        function resetTeacherScheduleToDefault() {
+            if (confirm(`${currentAdminTeacher} 교사의 등록된 주간 시간표를 모두 삭제하시겠습니까?`)) {
+                teacherTimetables[currentAdminTeacher] = { 0: {}, 1: {}, 2: {}, 3: {}, 4: {} };
+                renderAdminGrid();
+                showToast(`🧹 ${currentAdminTeacher} 교사 시간표가 비워졌습니다.`);
+            }
+        }
+
+        // 전체 초기값으로 복원
+        function resetAllSchedulesToInitial() {
+            if (confirm("모든 교사 시간표를 초기 예시 데이터로 복원하시겠습니까?")) {
+                teacherTimetables = JSON.parse(JSON.stringify(DEFAULT_TIMETABLES));
+                saveTimetablesToStorage();
+                renderAdminGrid();
+                showToast("🔄 모든 교사의 시간표가 초기 데이터로 복원되었습니다.");
+            }
+        }
+
+        // LocalStorage 함수
+        function saveReservationsToStorage() {
+            localStorage.setItem('sci_lab_reservations', JSON.stringify(reservations));
+        }
+
+        function saveTimetablesToStorage() {
+            localStorage.setItem('sci_lab_timetables', JSON.stringify(teacherTimetables));
+        }
+
+        function saveImagesToStorage() {
+            localStorage.setItem('sci_lab_teacher_images', JSON.stringify(teacherImages));
+        }
+
+        // UI 제어 유틸리티
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            document.getElementById('toastIcon').innerText = type === "error" ? "⚠️" : "✅";
+            
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
+        }
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            document.getElementById('btnPrevWeek').onclick = () => {
+                currentMonday = addDays(currentMonday, -7);
+                renderCalendarHeader();
+                renderTimetableGrid();
+            };
+
+            document.getElementById('btnNextWeek').onclick = () => {
+                currentMonday = addDays(currentMonday, 7);
+                renderCalendarHeader();
+                renderTimetableGrid();
+            };
+
+            document.getElementById('btnToday').onclick = () => {
+                currentMonday = getMonday(new Date());
+                renderCalendarHeader();
+                renderTimetableGrid();
+            };
+
+            document.getElementById('datePicker').onchange = (e) => {
+                if (e.target.value) {
+                    currentMonday = getMonday(new Date(e.target.value));
+                    renderCalendarHeader();
+                    renderTimetableGrid();
+                }
+            };
+
+            window.onclick = (e) => {
+                if (e.target.classList.contains('backdrop-blur-sm') || e.target.classList.contains('backdrop-blur-md')) {
+                    closeModal('modalReservation');
+                    closeModal('modalDetail');
+                    closeModal('modalAdminAuth');
+                    closeModal('modalAdminTimetable');
+                    closeModal('modalImageViewer');
+                }
+            };
+        }
+    </script>
+</body>
+</html>
